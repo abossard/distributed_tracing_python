@@ -2,11 +2,16 @@ rg=anbossar-py-test
 location=westeurope
 sa=anpystorage
 sb=anpyservicebus
+ai=anpyappinsights
 az group create -n $rg -l $location
 az storage account create -n $sa -g $rg -l $location --sku Standard_LRS
 # az cli get storage connection string
 export AZURE_STORAGE_CONNECTION_STRING=$(az storage account show-connection-string -g $rg -n $sa --query connectionString | tr -d \")
 echo AZURE_STORAGE_CONNECTION_STRING=$AZURE_STORAGE_CONNECTION_STRING >| src/.env
 echo AZURE_STORAGE_CONNECTION_STRING=$AZURE_STORAGE_CONNECTION_STRING >>| src/.env
-az servicebus namespace create --resource-group $rg --name $sb --location $location
-az servicebus queue create --resource-group $rg --namespace-name $sb --name $rg-sb-queue
+
+az monitor app-insights component create --app $ai --location $location --kind web -g $rg --application-type web --retention-time 120
+export APPINSIGHTS_INSTRUMENTATIONKEY=$(az monitor app-insights component show --app $ai -g $rg --query instrumentationKey | tr -d '"')
+
+# az servicebus namespace create --resource-group $rg --name $sb --location $location
+# az servicebus queue create --resource-group $rg --namespace-name $sb --name $rg-sb-queue

@@ -13,6 +13,7 @@ services:
     environment:
       - NAME_SERVICE=http://name_service:8080
       - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}
+      - APPINSIGHTS_INSTRUMENTATIONKEY=${APPINSIGHTS_INSTRUMENTATIONKEY}
       - STORAGE_QUEUE_NAME=name-service
   name_service:
     build:
@@ -22,6 +23,7 @@ services:
         MODULE: name_service
     environment:
       - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}
+      - APPINSIGHTS_INSTRUMENTATIONKEY=${APPINSIGHTS_INSTRUMENTATIONKEY}
       - STORAGE_QUEUE_NAME=name-service
     ports:
       - "8081:8080"

@@ -1,4 +1,10 @@
 import os
+import logging
+from opencensus.ext.azure.log_exporter import AzureLogHandler
+
+logger = logging.getLogger(__name__)
+logger.addHandler(AzureLogHandler())
+
 
 from azure.storage.queue import (
     QueueClient
@@ -31,6 +37,7 @@ def hello_name(name):
 
 @app.route("/process")
 def process_queue():
+    logger.info("Path: /process")
     messages = queue_client.receive_messages()
     contents = [message.content for message in messages]
     for message in messages:
