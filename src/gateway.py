@@ -1,31 +1,17 @@
 import os
 
 import requests
-import logging
-from opencensus.ext.azure.log_exporter import AzureLogHandler
-from opencensus.ext.azure.trace_exporter import AzureExporter
-from opencensus.ext.flask.flask_middleware import FlaskMiddleware
-from opencensus.trace import config_integration
-from opencensus.trace.samplers import AlwaysOnSampler
-from opencensus.trace.tracer import Tracer
 
-config_integration.trace_integrations(['logging'])
-logging.basicConfig(format='%(asctime)s traceId=%(traceId)s spanId=%(spanId)s %(message)s')
-tracer = Tracer(sampler=AlwaysOnSampler())
+from az_logging import wrap_the_app
 
-logger = logging.getLogger(__name__)
-logger.addHandler(AzureLogHandler())
-
-from azure.storage.queue import (
-    QueueClient
-)
 from flask import Flask, request
 
 app = Flask(__name__)
 
-middleware = FlaskMiddleware(
-    app,
-    exporter=AzureExporter()
+logger, tracer = wrap_the_app(__name__, app)
+
+from azure.storage.queue import (
+    QueueClient
 )
 
 name_service_url = os.environ.get('NAME_SERVICE') or "http://localhost:8081"
@@ -45,10 +31,13 @@ def trigger_message_processing():
 
 @app.route("/")
 def hello_world():
-    with tracer.span(name='hello'):
-        logger.warning('In the span')
+    with tracer.span(name='calling services') as services_span:
+        processing_result = trigger_message_processing()
+        service_result = call_name_service(request.user_agent.browser)
     logger.info("Path: /")
     return "Hello, World! You are {}\n(Output: {})".format(
-        call_name_service(request.user_agent.browser),
-        trigger_message_processing()
+        service_result, processing_result
     )
+
+
+logger.info("READY")

@@ -26,6 +26,7 @@ opencensus-context==0.1.2
 opencensus-ext-azure==1.1.0
 opencensus-ext-flask==0.7.6
 opencensus-ext-logging==0.1.1
+opencensus-ext-requests==0.7.6
 portalocker==1.7.1
 protobuf==3.19.1
 psutil==5.8.0
@@ -39,3 +40,4 @@ rsa==4.8
 six==1.16.0
 urllib3==1.26.7
 Werkzeug==1.0.1
+wrapt==1.13.3

@@ -1,17 +1,16 @@
 import os
-import logging
-from opencensus.ext.azure.log_exporter import AzureLogHandler
 
-logger = logging.getLogger(__name__)
-logger.addHandler(AzureLogHandler())
-
+from az_logging import wrap_the_app
 
 from azure.storage.queue import (
     QueueClient
 )
+
 from flask import Flask
 
 app = Flask(__name__)
+
+logger, tracer = wrap_the_app(__name__, app)
 
 storage_queue_connection = os.environ.get("AZURE_STORAGE_CONNECTION_STRING")
 storage_queue_name = os.environ.get("STORAGE_QUEUE_NAME")
